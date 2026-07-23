@@ -135,6 +135,13 @@ public:
     CONFIG_GETTER_SETTER(squareMagnifier, setSquareMagnifier, bool)
     CONFIG_GETTER_SETTER(copyOnDoubleClick, setCopyOnDoubleClick, bool)
     CONFIG_GETTER_SETTER(uploadClientSecret, setUploadClientSecret, QString)
+    CONFIG_GETTER_SETTER(cloudinaryCloudName, setCloudinaryCloudName, QString)
+    CONFIG_GETTER_SETTER(cloudinaryUploadPreset, setCloudinaryUploadPreset, QString)
+    CONFIG_GETTER_SETTER(cloudinaryApiKey, setCloudinaryApiKey, QString)
+    CONFIG_GETTER_SETTER(cloudinaryApiSecret, setCloudinaryApiSecret, QString)
+    CONFIG_GETTER_SETTER(cloudinaryUseSignedPreset,
+                         setCloudinaryUseSignedPreset,
+                         bool)
     CONFIG_GETTER_SETTER(saveLastRegion, setSaveLastRegion, bool)
     CONFIG_GETTER_SETTER(showSelectionGeometry, setShowSelectionGeometry, int)
     CONFIG_GETTER_SETTER(jpegQuality, setJpegQuality, int)

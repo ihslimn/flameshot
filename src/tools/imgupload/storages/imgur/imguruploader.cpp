@@ -76,37 +76,15 @@ void ImgurUploader::handleReply(QNetworkReply* reply)
 
 void ImgurUploader::upload()
 {
-    QByteArray byteArray;
-    QBuffer buffer(&byteArray);
-    pixmap().save(&buffer, "PNG");
-
-    QUrlQuery urlQuery;
-    urlQuery.addQueryItem(QStringLiteral("title"), QStringLiteral(""));
-    QString description = FileNameHandler().parsedPattern();
-    urlQuery.addQueryItem(QStringLiteral("description"), description);
-
-    QUrl url(QStringLiteral("https://api.imgur.com/3/image"));
-    url.setQuery(urlQuery);
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader,
-                      "application/application/x-www-form-urlencoded");
-    request.setRawHeader("Authorization",
-                         QStringLiteral("Client-ID %1")
-                           .arg(ConfigHandler().uploadClientSecret())
-                           .toUtf8());
-
-    m_NetworkAM->post(request, byteArray);
+    Q_UNUSED(m_NetworkAM)
+    setInfoLabelText(tr("Imgur uploads are disabled. Cloudinary is used instead."));
 }
 
 void ImgurUploader::deleteImage(const QString& fileName,
                                 const QString& deleteToken)
 {
     Q_UNUSED(fileName)
-    bool successful = QDesktopServices::openUrl(
-      QUrl(QStringLiteral("https://imgur.com/delete/%1").arg(deleteToken)));
-    if (!successful) {
-        notification()->showMessage(tr("Unable to open the URL."));
-    }
-
+    Q_UNUSED(deleteToken)
+    notification()->showMessage(tr("Imgur uploads are disabled. Cloudinary is used instead."));
     emit deleteOk();
 }

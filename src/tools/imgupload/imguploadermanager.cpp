@@ -5,7 +5,7 @@
 #include "imguploadermanager.h"
 // TODO - remove this hard-code and create plugin manager in the future, you may
 // include other storage headers here
-#include "tools/imgupload/storages/imgur/imguruploader.h"
+#include "tools/imgupload/storages/cloudinary/cloudinaryuploader.h"
 
 #include <QPixmap>
 #include <QWidget>
@@ -21,16 +21,11 @@ ImgUploaderManager::ImgUploaderManager(QObject* parent)
 
 void ImgUploaderManager::init()
 {
-    // TODO - implement ImgUploader for other Storages and selection among them,
-    // example:
-    // if (uploaderPlugin().compare("s3") == 0) {
-    //    m_qstrUrl = ImgS3Settings().value("S3", "S3_URL").toString();
-    //} else {
-    //    m_qstrUrl = "https://imgur.com/";
-    //    m_imgUploaderPlugin = "imgur";
-    //}
-    m_urlString = "https://imgur.com/";
-    m_imgUploaderPlugin = "imgur";
+    // Cloudinary is the active upload backend for screenshots.
+    // Keep the upload flow explicit here so legacy plugin choices cannot
+    // fall back to the old Imgur implementation.
+    m_urlString = "https://res.cloudinary.com/";
+    m_imgUploaderPlugin = "cloudinary";
 }
 
 ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
@@ -45,7 +40,8 @@ ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
     //    m_imgUploaderBase =
     //      (ImgUploaderBase*)(new ImgurUploader(capture, parent));
     //}
-    m_imgUploaderBase = (ImgUploaderBase*)(new ImgurUploader(capture, parent));
+    m_imgUploaderBase =
+      (ImgUploaderBase*)(new CloudinaryUploader(capture, parent));
     if (m_imgUploaderBase && !capture.isNull()) {
         m_imgUploaderBase->upload();
     }
@@ -54,7 +50,7 @@ ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
 
 ImgUploaderBase* ImgUploaderManager::uploader(const QString& imgUploaderPlugin)
 {
-    m_imgUploaderPlugin = imgUploaderPlugin;
+    Q_UNUSED(imgUploaderPlugin)
     init();
     return uploader(QPixmap());
 }

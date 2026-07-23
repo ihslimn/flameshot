@@ -7,7 +7,7 @@
 
 #include <QObject>
 
-#define IMG_UPLOADER_STORAGE_DEFAULT "imgur"
+#define IMG_UPLOADER_STORAGE_DEFAULT "cloudinary"
 
 class QPixmap;
 class QWidget;

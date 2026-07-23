@@ -54,6 +54,10 @@ private slots:
     void resetConfiguration();
     void togglePathFixed();
     void uploadClientKeyEdited();
+    void cloudinaryApiKeyEdited();
+    void cloudinaryCloudNameEdited();
+    void cloudinaryApiSecretEdited();
+    void cloudinaryUseSignedPresetChanged(bool checked);
     void useJpgForClipboardChanged(bool checked);
     void setSaveAsFileExtension(const QString& extension);
     void setGeometryLocation(int index);
@@ -103,6 +107,10 @@ private:
     void initUseJpgForClipboard();
     void initUploadHistoryMax();
     void initUploadClientSecret();
+    void initCloudinaryCloudName();
+    void initCloudinaryApiKey();
+    void initCloudinaryApiSecret();
+    void initCloudinaryUseSignedPreset();
     void initSaveLastRegion();
     void initShowSelectionGeometry();
     void initJpegQuality();
@@ -148,6 +156,10 @@ private:
     QCheckBox* m_saveAfterCopy;
     QLineEdit* m_savePath;
     QLineEdit* m_uploadClientKey;
+    QLineEdit* m_cloudinaryCloudName;
+    QLineEdit* m_cloudinaryApiKey;
+    QLineEdit* m_cloudinaryApiSecret;
+    QCheckBox* m_cloudinaryUseSignedPreset;
     QPushButton* m_changeSaveButton;
     QCheckBox* m_screenshotPathFixedCheck;
     QCheckBox* m_historyConfirmationToDelete;

@@ -69,6 +69,10 @@ GeneralConf::GeneralConf(QWidget* parent)
     initHistoryConfirmationToDelete();
     initUploadHistoryMax();
     initUploadClientSecret();
+    initCloudinaryCloudName();
+    initCloudinaryApiKey();
+    initCloudinaryApiSecret();
+    initCloudinaryUseSignedPreset();
 #endif
     initPredefinedColorPaletteLarge();
     initShowSelectionGeometry();
@@ -104,6 +108,8 @@ void GeneralConf::_updateComponents(bool allowEmptySavePath)
       config.historyConfirmationToDelete());
 
     m_uploadHistoryMax->setValue(config.uploadHistoryMax());
+    m_cloudinaryUseSignedPreset->setChecked(
+      config.cloudinaryUseSignedPreset());
 #endif
 #if !defined(DISABLE_UPDATE_CHECKER)
     m_checkForUpdates->setChecked(config.checkForUpdates());
@@ -603,7 +609,7 @@ void GeneralConf::initUploadHistoryMax()
 
 void GeneralConf::initUploadClientSecret()
 {
-    auto* box = new QGroupBox(tr("Imgur Application Client ID"));
+    auto* box = new QGroupBox(tr("Cloudinary upload preset"));
     box->setFlat(true);
     m_layout->addWidget(box);
 
@@ -614,7 +620,7 @@ void GeneralConf::initUploadClientSecret()
     QString foreground = this->palette().windowText().color().name();
     m_uploadClientKey->setStyleSheet(
       QStringLiteral("color: %1").arg(foreground));
-    m_uploadClientKey->setText(ConfigHandler().uploadClientSecret());
+    m_uploadClientKey->setText(ConfigHandler().cloudinaryUploadPreset());
     connect(m_uploadClientKey,
             &QLineEdit::editingFinished,
             this,
@@ -622,9 +628,106 @@ void GeneralConf::initUploadClientSecret()
     vboxLayout->addWidget(m_uploadClientKey);
 }
 
+void GeneralConf::initCloudinaryCloudName()
+{
+    auto* box = new QGroupBox(tr("Cloudinary cloud name"));
+    box->setFlat(true);
+    m_layout->addWidget(box);
+
+    auto* vboxLayout = new QVBoxLayout();
+    box->setLayout(vboxLayout);
+
+    m_cloudinaryCloudName = new QLineEdit(this);
+    QString foreground = this->palette().windowText().color().name();
+    m_cloudinaryCloudName->setStyleSheet(
+      QStringLiteral("color: %1").arg(foreground));
+    m_cloudinaryCloudName->setText(ConfigHandler().cloudinaryCloudName());
+    connect(m_cloudinaryCloudName,
+            &QLineEdit::editingFinished,
+            this,
+            &GeneralConf::cloudinaryCloudNameEdited);
+    vboxLayout->addWidget(m_cloudinaryCloudName);
+}
+
 void GeneralConf::uploadClientKeyEdited()
 {
-    ConfigHandler().setUploadClientSecret(m_uploadClientKey->text());
+    ConfigHandler().setCloudinaryUploadPreset(m_uploadClientKey->text());
+}
+
+void GeneralConf::cloudinaryCloudNameEdited()
+{
+    ConfigHandler().setCloudinaryCloudName(m_cloudinaryCloudName->text());
+}
+
+void GeneralConf::initCloudinaryApiSecret()
+{
+    auto* box = new QGroupBox(tr("Cloudinary API secret (for signed uploads)"));
+    box->setFlat(true);
+    m_layout->addWidget(box);
+
+    auto* vboxLayout = new QVBoxLayout();
+    box->setLayout(vboxLayout);
+
+    m_cloudinaryApiSecret = new QLineEdit(this);
+    m_cloudinaryApiSecret->setEchoMode(QLineEdit::Password);
+    QString foreground = this->palette().windowText().color().name();
+    m_cloudinaryApiSecret->setStyleSheet(
+      QStringLiteral("color: %1").arg(foreground));
+    m_cloudinaryApiSecret->setText(ConfigHandler().cloudinaryApiSecret());
+    connect(m_cloudinaryApiSecret,
+            &QLineEdit::editingFinished,
+            this,
+            &GeneralConf::cloudinaryApiSecretEdited);
+    vboxLayout->addWidget(m_cloudinaryApiSecret);
+}
+
+void GeneralConf::cloudinaryApiSecretEdited()
+{
+    ConfigHandler().setCloudinaryApiSecret(m_cloudinaryApiSecret->text());
+}
+
+  void GeneralConf::initCloudinaryApiKey()
+  {
+    auto* box = new QGroupBox(tr("Cloudinary API key (for signed uploads)"));
+    box->setFlat(true);
+    m_layout->addWidget(box);
+
+    auto* vboxLayout = new QVBoxLayout();
+    box->setLayout(vboxLayout);
+
+    m_cloudinaryApiKey = new QLineEdit(this);
+    QString foreground = this->palette().windowText().color().name();
+    m_cloudinaryApiKey->setStyleSheet(
+      QStringLiteral("color: %1").arg(foreground));
+    m_cloudinaryApiKey->setText(ConfigHandler().cloudinaryApiKey());
+    connect(m_cloudinaryApiKey,
+        &QLineEdit::editingFinished,
+        this,
+        &GeneralConf::cloudinaryApiKeyEdited);
+    vboxLayout->addWidget(m_cloudinaryApiKey);
+  }
+
+  void GeneralConf::cloudinaryApiKeyEdited()
+  {
+    ConfigHandler().setCloudinaryApiKey(m_cloudinaryApiKey->text());
+  }
+
+void GeneralConf::initCloudinaryUseSignedPreset()
+{
+    m_cloudinaryUseSignedPreset = new QCheckBox(
+      tr("Use signed preset for Cloudinary uploads"), this);
+    m_cloudinaryUseSignedPreset->setChecked(
+      ConfigHandler().cloudinaryUseSignedPreset());
+    connect(m_cloudinaryUseSignedPreset,
+            &QCheckBox::clicked,
+            this,
+            &GeneralConf::cloudinaryUseSignedPresetChanged);
+    m_scrollAreaLayout->addWidget(m_cloudinaryUseSignedPreset);
+}
+
+void GeneralConf::cloudinaryUseSignedPresetChanged(bool checked)
+{
+    ConfigHandler().setCloudinaryUseSignedPreset(checked);
 }
 
 void GeneralConf::uploadHistoryMaxChanged(int max)

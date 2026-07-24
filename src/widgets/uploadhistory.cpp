@@ -1,6 +1,7 @@
 #include "uploadhistory.h"
 #include "./ui_uploadhistory.h"
 #include "tools/imgupload/imguploadermanager.h"
+#include "utils/confighandler.h"
 #include "utils/history.h"
 #include "widgets/uploadlineitem.h"
 
@@ -71,7 +72,13 @@ void UploadHistory::addLine(const QString& path, const QString& fileName)
     History history;
     HistoryFileName unpackFileName = history.unpackFileName(fileName);
 
-    QString url = ImgUploaderManager(this).url();
+    QString url;
+    if (unpackFileName.type == QStringLiteral("freeimage.host")) {
+        url = QStringLiteral("https://iili.io/");
+    } else {
+        url = QStringLiteral("https://res.cloudinary.com/%1/image/upload/")
+                .arg(ConfigHandler().cloudinaryCloudName().trimmed());
+    }
     if (unpackFileName.type == QStringLiteral("cloudinary") &&
         !unpackFileName.token.isEmpty()) {
         url += QStringLiteral("v%1/").arg(unpackFileName.token);

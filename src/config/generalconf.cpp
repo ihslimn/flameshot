@@ -68,11 +68,13 @@ GeneralConf::GeneralConf(QWidget* parent)
     initUploadWithoutConfirmation();
     initHistoryConfirmationToDelete();
     initUploadHistoryMax();
+    initUploadProvider();
     initUploadClientSecret();
     initCloudinaryCloudName();
     initCloudinaryApiKey();
     initCloudinaryApiSecret();
     initCloudinaryUseSignedPreset();
+    initFreeImageHostApiKey();
 #endif
     initPredefinedColorPaletteLarge();
     initShowSelectionGeometry();
@@ -110,6 +112,10 @@ void GeneralConf::_updateComponents(bool allowEmptySavePath)
     m_uploadHistoryMax->setValue(config.uploadHistoryMax());
     m_cloudinaryUseSignedPreset->setChecked(
       config.cloudinaryUseSignedPreset());
+    const int providerIndex =
+      m_uploadProvider->findData(config.uploadProvider());
+    m_uploadProvider->setCurrentIndex(providerIndex < 0 ? 0 : providerIndex);
+    uploadProviderChanged(m_uploadProvider->currentIndex());
 #endif
 #if !defined(DISABLE_UPDATE_CHECKER)
     m_checkForUpdates->setChecked(config.checkForUpdates());
@@ -613,6 +619,7 @@ void GeneralConf::initUploadClientSecret()
     auto* box = new QGroupBox(tr("Cloudinary upload preset"));
     box->setFlat(true);
     m_scrollAreaLayout->addWidget(box);
+    m_cloudinarySettings.append(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -629,11 +636,70 @@ void GeneralConf::initUploadClientSecret()
     vboxLayout->addWidget(m_uploadClientKey);
 }
 
+void GeneralConf::initUploadProvider()
+{
+    auto* box = new QGroupBox(tr("Image upload service"));
+    box->setFlat(true);
+    m_scrollAreaLayout->addWidget(box);
+    auto* layout = new QVBoxLayout(box);
+
+    m_uploadProvider = new QComboBox(this);
+    m_uploadProvider->addItem(QStringLiteral("Cloudinary"),
+                              QStringLiteral("cloudinary"));
+    m_uploadProvider->addItem(QStringLiteral("freeimage.host"),
+                              QStringLiteral("freeimage.host"));
+    const int index =
+      m_uploadProvider->findData(ConfigHandler().uploadProvider());
+    m_uploadProvider->setCurrentIndex(index < 0 ? 0 : index);
+    connect(m_uploadProvider,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &GeneralConf::uploadProviderChanged);
+    layout->addWidget(m_uploadProvider);
+}
+
+void GeneralConf::uploadProviderChanged(int index)
+{
+    const QString provider = m_uploadProvider->itemData(index).toString();
+    ConfigHandler().setUploadProvider(provider);
+    const bool cloudinary = provider == QStringLiteral("cloudinary");
+    for (QWidget* widget : m_cloudinarySettings) {
+        widget->setVisible(cloudinary);
+    }
+    for (QWidget* widget : m_freeImageHostSettings) {
+        widget->setVisible(!cloudinary);
+    }
+}
+
+void GeneralConf::initFreeImageHostApiKey()
+{
+    auto* box = new QGroupBox(tr("freeimage.host API key"));
+    box->setFlat(true);
+    m_scrollAreaLayout->addWidget(box);
+    m_freeImageHostSettings.append(box);
+    auto* layout = new QVBoxLayout(box);
+    m_freeImageHostApiKey = new QLineEdit(this);
+    m_freeImageHostApiKey->setEchoMode(QLineEdit::Password);
+    m_freeImageHostApiKey->setText(ConfigHandler().freeImageHostApiKey());
+    connect(m_freeImageHostApiKey,
+            &QLineEdit::editingFinished,
+            this,
+            &GeneralConf::freeImageHostApiKeyEdited);
+    layout->addWidget(m_freeImageHostApiKey);
+    uploadProviderChanged(m_uploadProvider->currentIndex());
+}
+
+void GeneralConf::freeImageHostApiKeyEdited()
+{
+    ConfigHandler().setFreeImageHostApiKey(m_freeImageHostApiKey->text());
+}
+
 void GeneralConf::initCloudinaryCloudName()
 {
     auto* box = new QGroupBox(tr("Cloudinary cloud name"));
     box->setFlat(true);
     m_scrollAreaLayout->addWidget(box);
+    m_cloudinarySettings.append(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -665,6 +731,7 @@ void GeneralConf::initCloudinaryApiSecret()
     auto* box = new QGroupBox(tr("Cloudinary API secret"));
     box->setFlat(true);
     m_scrollAreaLayout->addWidget(box);
+    m_cloudinarySettings.append(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -692,6 +759,7 @@ void GeneralConf::cloudinaryApiSecretEdited()
     auto* box = new QGroupBox(tr("Cloudinary API key"));
     box->setFlat(true);
     m_scrollAreaLayout->addWidget(box);
+    m_cloudinarySettings.append(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -724,6 +792,7 @@ void GeneralConf::initCloudinaryUseSignedPreset()
             this,
             &GeneralConf::cloudinaryUseSignedPresetChanged);
     m_scrollAreaLayout->addWidget(m_cloudinaryUseSignedPreset);
+    m_cloudinarySettings.append(m_cloudinaryUseSignedPreset);
 }
 
 void GeneralConf::cloudinaryUseSignedPresetChanged(bool checked)

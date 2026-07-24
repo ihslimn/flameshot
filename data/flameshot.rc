@@ -31,12 +31,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "The flameshot Org."
             VALUE "FileDescription",  "Flameshot"
-            VALUE "FileVersion",      VER_FILEVERSION_STR
+            VALUE "FileVersion",      "14.0.0"
             VALUE "InternalName",     "flameshot"
             VALUE "LegalCopyright",   "Copyright (C) 2017-2020 flameshot.org"
             VALUE "OriginalFilename", "flameshot.exe"
             VALUE "ProductName",      "Flameshot"
-            VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+            VALUE "ProductVersion",   "14.0.0"
         END
     END
 

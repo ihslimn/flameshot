@@ -132,6 +132,8 @@ static QMap<class QString, QSharedPointer<ValueHandler>>
     // drawFontSize, remember to update ConfigHandler::toolSize
     OPTION("copyOnDoubleClick"           ,Bool               ( false         )),
     OPTION("uploadClientSecret"          ,String             ( ""            )),
+    OPTION("uploadProvider"              ,String             ( "cloudinary"  )),
+    OPTION("freeImageHostApiKey"         ,String             ( ""            )),
     OPTION("cloudinaryCloudName"         ,String             ( ""            )),
     OPTION("cloudinaryApiKey"           ,String             ( ""            )),
     OPTION("cloudinaryUploadPreset"      ,String             ( ""            )),

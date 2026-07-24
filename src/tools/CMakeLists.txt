@@ -12,6 +12,8 @@ target_sources(
   flameshot
         PRIVATE imgupload/storages/cloudinary/cloudinaryuploader.h
         imgupload/storages/cloudinary/cloudinaryuploader.cpp
+        imgupload/storages/freeimagehost/freeimagehostuploader.h
+        imgupload/storages/freeimagehost/freeimagehostuploader.cpp
         imgupload/storages/imgur/imguruploader.h
         imgupload/storages/imgur/imguruploader.cpp
         imgupload/storages/imguploaderbase.h

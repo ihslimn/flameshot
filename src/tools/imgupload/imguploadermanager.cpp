@@ -6,6 +6,7 @@
 // TODO - remove this hard-code and create plugin manager in the future, you may
 // include other storage headers here
 #include "tools/imgupload/storages/cloudinary/cloudinaryuploader.h"
+#include "tools/imgupload/storages/freeimagehost/freeimagehostuploader.h"
 #include "utils/confighandler.h"
 
 #include <QPixmap>
@@ -22,12 +23,15 @@ ImgUploaderManager::ImgUploaderManager(QObject* parent)
 
 void ImgUploaderManager::init()
 {
-    // Cloudinary is the active upload backend for screenshots.
-    // Keep the upload flow explicit here so legacy plugin choices cannot
-    // fall back to the old Imgur implementation.
-    m_urlString = QStringLiteral("https://res.cloudinary.com/%1/image/upload/")
-                    .arg(ConfigHandler().cloudinaryCloudName().trimmed());
-    m_imgUploaderPlugin = "cloudinary";
+    m_imgUploaderPlugin = ConfigHandler().uploadProvider();
+    if (m_imgUploaderPlugin == QStringLiteral("freeimage.host")) {
+        m_urlString = QStringLiteral("https://iili.io/");
+    } else {
+        m_imgUploaderPlugin = QStringLiteral("cloudinary");
+        m_urlString =
+          QStringLiteral("https://res.cloudinary.com/%1/image/upload/")
+            .arg(ConfigHandler().cloudinaryCloudName().trimmed());
+    }
 }
 
 ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
@@ -42,8 +46,11 @@ ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
     //    m_imgUploaderBase =
     //      (ImgUploaderBase*)(new ImgurUploader(capture, parent));
     //}
-    m_imgUploaderBase =
-      (ImgUploaderBase*)(new CloudinaryUploader(capture, parent));
+    if (m_imgUploaderPlugin == QStringLiteral("freeimage.host")) {
+        m_imgUploaderBase = new FreeImageHostUploader(capture, parent);
+    } else {
+        m_imgUploaderBase = new CloudinaryUploader(capture, parent);
+    }
     if (m_imgUploaderBase && !capture.isNull()) {
         m_imgUploaderBase->upload();
     }
@@ -53,8 +60,16 @@ ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
 ImgUploaderBase* ImgUploaderManager::uploader(const QString& imgUploaderPlugin,
                                               QWidget* parent)
 {
-    Q_UNUSED(imgUploaderPlugin)
     init();
+    if (imgUploaderPlugin == QStringLiteral("freeimage.host")) {
+        m_imgUploaderPlugin = imgUploaderPlugin;
+        m_urlString = QStringLiteral("https://iili.io/");
+    } else if (imgUploaderPlugin == QStringLiteral("cloudinary")) {
+        m_imgUploaderPlugin = imgUploaderPlugin;
+        m_urlString =
+          QStringLiteral("https://res.cloudinary.com/%1/image/upload/")
+            .arg(ConfigHandler().cloudinaryCloudName().trimmed());
+    }
     return uploader(QPixmap(), parent);
 }
 

@@ -54,6 +54,8 @@ private slots:
     void resetConfiguration();
     void togglePathFixed();
     void uploadClientKeyEdited();
+    void uploadProviderChanged(int index);
+    void freeImageHostApiKeyEdited();
     void cloudinaryApiKeyEdited();
     void cloudinaryCloudNameEdited();
     void cloudinaryApiSecretEdited();
@@ -107,6 +109,8 @@ private:
     void initUseJpgForClipboard();
     void initUploadHistoryMax();
     void initUploadClientSecret();
+    void initUploadProvider();
+    void initFreeImageHostApiKey();
     void initCloudinaryCloudName();
     void initCloudinaryApiKey();
     void initCloudinaryApiSecret();
@@ -156,6 +160,10 @@ private:
     QCheckBox* m_saveAfterCopy;
     QLineEdit* m_savePath;
     QLineEdit* m_uploadClientKey;
+    QComboBox* m_uploadProvider;
+    QLineEdit* m_freeImageHostApiKey;
+    QList<QWidget*> m_cloudinarySettings;
+    QList<QWidget*> m_freeImageHostSettings;
     QLineEdit* m_cloudinaryCloudName;
     QLineEdit* m_cloudinaryApiKey;
     QLineEdit* m_cloudinaryApiSecret;

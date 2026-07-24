@@ -43,14 +43,25 @@ UploadLineItem::UploadLineItem(QWidget* parent,
     });
 
     connect(ui->deleteImage, &QPushButton::clicked, this, [=, this]() {
+        const bool localOnly =
+          unpackFileName.type == QStringLiteral("freeimage.host");
         if (ConfigHandler().historyConfirmationToDelete() &&
             QMessageBox::No ==
               QMessageBox::question(
                 this,
                 tr("Confirm to delete"),
-                tr("Are you sure you want to delete a screenshot from the "
-                   "latest uploads and server?"),
+                localOnly
+                  ? tr("Are you sure you want to remove this screenshot from "
+                       "the latest uploads?")
+                  : tr("Are you sure you want to delete a screenshot from the "
+                       "latest uploads and server?"),
                 QMessageBox::Yes | QMessageBox::No)) {
+            return;
+        }
+
+        if (localOnly) {
+            removeCacheFile(fullFileName);
+            emit requestedDeletion();
             return;
         }
 

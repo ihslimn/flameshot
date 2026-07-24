@@ -85,6 +85,9 @@ void ImgurUploader::deleteImage(const QString& fileName,
 {
     Q_UNUSED(fileName)
     Q_UNUSED(deleteToken)
-    notification()->showMessage(tr("Imgur uploads are disabled. Cloudinary is used instead."));
+    if (notification()) {
+        notification()->showMessage(
+          tr("Imgur uploads are disabled. Cloudinary is used instead."));
+    }
     emit deleteOk();
 }

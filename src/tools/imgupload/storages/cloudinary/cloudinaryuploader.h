@@ -25,6 +25,7 @@ private slots:
 
 private:
     void upload();
+    void handleDeleteReply(QNetworkReply* reply);
 
 private:
     QNetworkAccessManager* m_NetworkAM;

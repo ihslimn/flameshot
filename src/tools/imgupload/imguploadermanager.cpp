@@ -50,11 +50,12 @@ ImgUploaderBase* ImgUploaderManager::uploader(const QPixmap& capture,
     return m_imgUploaderBase;
 }
 
-ImgUploaderBase* ImgUploaderManager::uploader(const QString& imgUploaderPlugin)
+ImgUploaderBase* ImgUploaderManager::uploader(const QString& imgUploaderPlugin,
+                                              QWidget* parent)
 {
     Q_UNUSED(imgUploaderPlugin)
     init();
-    return uploader(QPixmap());
+    return uploader(QPixmap(), parent);
 }
 
 const QString& ImgUploaderManager::uploaderPlugin()

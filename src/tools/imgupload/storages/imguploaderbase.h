@@ -38,6 +38,7 @@ public:
 signals:
     void uploadOk(const QUrl& url);
     void deleteOk();
+    void deleteFailed(const QString& message);
 
 public slots:
     void showPostUploadDialog();

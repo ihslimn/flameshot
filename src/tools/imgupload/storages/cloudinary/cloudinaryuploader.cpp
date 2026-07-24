@@ -10,7 +10,7 @@
 
 #include <QBuffer>
 #include <QCryptographicHash>
-#include <QDesktopServices>
+#include <QFileInfo>
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QJsonDocument>
@@ -20,6 +20,7 @@
 #include <QNetworkRequest>
 #include <QShortcut>
 #include <QDateTime>
+#include <QUrlQuery>
 
 CloudinaryUploader::CloudinaryUploader(const QPixmap& capture, QWidget* parent)
   : ImgUploaderBase(capture, parent)
@@ -33,6 +34,13 @@ CloudinaryUploader::CloudinaryUploader(const QPixmap& capture, QWidget* parent)
 
 void CloudinaryUploader::handleReply(QNetworkReply* reply)
 {
+    if (reply->property("cloudinaryOperation").toString() ==
+        QStringLiteral("delete")) {
+        handleDeleteReply(reply);
+        reply->deleteLater();
+        return;
+    }
+
     spinner()->deleteLater();
     m_currentImageName.clear();
 
@@ -194,13 +202,74 @@ void CloudinaryUploader::upload()
 void CloudinaryUploader::deleteImage(const QString& fileName,
                                      const QString& deleteToken)
 {
-    Q_UNUSED(fileName)
     Q_UNUSED(deleteToken)
 
-    const bool successful = QDesktopServices::openUrl(imageURL());
-    if (!successful) {
-        notification()->showMessage(tr("Unable to open the URL."));
+    const QString cloudName = ConfigHandler().cloudinaryCloudName().trimmed();
+    const QString apiKey = ConfigHandler().cloudinaryApiKey().trimmed();
+    const QString apiSecret = ConfigHandler().cloudinaryApiSecret().trimmed();
+    if (cloudName.isEmpty() || apiKey.isEmpty() || apiSecret.isEmpty()) {
+        emit deleteFailed(tr("Cloudinary deletion requires cloud name, API key, "
+                             "and API secret in Settings."));
+        return;
     }
 
-    emit deleteOk();
+    const QString publicId = QFileInfo(fileName).completeBaseName();
+    if (publicId.isEmpty()) {
+        emit deleteFailed(
+          tr("Unable to determine Cloudinary public ID for this screenshot."));
+        return;
+    }
+
+    const QString timestamp =
+      QString::number(QDateTime::currentSecsSinceEpoch());
+    const QString toSign =
+      QStringLiteral("invalidate=true&public_id=%1&timestamp=%2")
+        .arg(publicId, timestamp);
+    const QByteArray signatureData = QCryptographicHash::hash(
+      (toSign + apiSecret).toUtf8(), QCryptographicHash::Sha256);
+    const QString signature = QString::fromLatin1(signatureData.toHex());
+
+    QUrl url(QStringLiteral("https://api.cloudinary.com/v1_1/%1/image/destroy")
+               .arg(cloudName));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      QStringLiteral("application/x-www-form-urlencoded"));
+
+    QUrlQuery params;
+    params.addQueryItem(QStringLiteral("invalidate"), QStringLiteral("true"));
+    params.addQueryItem(QStringLiteral("public_id"), publicId);
+    params.addQueryItem(QStringLiteral("timestamp"), timestamp);
+    params.addQueryItem(QStringLiteral("api_key"), apiKey);
+    params.addQueryItem(QStringLiteral("signature"), signature);
+
+    QNetworkReply* reply =
+      m_NetworkAM->post(request, params.toString(QUrl::FullyEncoded).toUtf8());
+    reply->setProperty("cloudinaryOperation", QStringLiteral("delete"));
+}
+
+void CloudinaryUploader::handleDeleteReply(QNetworkReply* reply)
+{
+    const QByteArray responseData = reply->readAll();
+    const QJsonDocument response = QJsonDocument::fromJson(responseData);
+    const QJsonObject json = response.object();
+
+    const QString result = json.value(QStringLiteral("result")).toString();
+    if (reply->error() == QNetworkReply::NoError &&
+        (result == QStringLiteral("ok") ||
+         result == QStringLiteral("not found"))) {
+        emit deleteOk();
+        return;
+    }
+
+    QString message = reply->errorString();
+    if (json.contains(QStringLiteral("error")) &&
+        json.value(QStringLiteral("error")).isObject()) {
+        const QJsonObject errorObj =
+          json.value(QStringLiteral("error")).toObject();
+        message = errorObj.value(QStringLiteral("message")).toString(message);
+    } else if (!result.isEmpty()) {
+        message = tr("Cloudinary returned: %1").arg(result);
+    }
+
+    emit deleteFailed(message);
 }

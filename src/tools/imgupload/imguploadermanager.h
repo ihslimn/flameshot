@@ -20,7 +20,8 @@ public:
 
     ImgUploaderBase* uploader(const QPixmap& capture,
                               QWidget* parent = nullptr);
-    ImgUploaderBase* uploader(const QString& imgUploaderPlugin);
+    ImgUploaderBase* uploader(const QString& imgUploaderPlugin,
+                              QWidget* parent = nullptr);
 
     const QString& url();
     const QString& uploaderPlugin();

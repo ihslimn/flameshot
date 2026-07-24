@@ -95,7 +95,7 @@ void UploadHistory::addLine(const QString& path, const QString& fileName)
         if (ui->historyContainer->count() <= 1) {
             setEmptyMessage();
         }
-        delete line;
+        line->deleteLater();
     });
 
     ui->historyContainer->addWidget(line);

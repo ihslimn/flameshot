@@ -55,11 +55,22 @@ UploadLineItem::UploadLineItem(QWidget* parent,
         }
 
         ImgUploaderBase* imgUploaderBase =
-          ImgUploaderManager(this).uploader(unpackFileName.type);
+          ImgUploaderManager(this).uploader(unpackFileName.type, this);
+        ui->deleteImage->setEnabled(false);
+        connect(imgUploaderBase, &ImgUploaderBase::deleteOk, this, [=, this]() {
+            removeCacheFile(fullFileName);
+            emit requestedDeletion();
+        }, Qt::QueuedConnection);
+        connect(imgUploaderBase,
+                &ImgUploaderBase::deleteFailed,
+                this,
+                [=, this](const QString& message) {
+                    ui->deleteImage->setEnabled(true);
+                    QMessageBox::warning(this, tr("Unable to delete"), message);
+                    imgUploaderBase->deleteLater();
+                },
+                Qt::QueuedConnection);
         imgUploaderBase->deleteImage(unpackFileName.file, unpackFileName.token);
-
-        removeCacheFile(fullFileName);
-        emit requestedDeletion();
     });
 }
 

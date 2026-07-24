@@ -71,7 +71,12 @@ void UploadHistory::addLine(const QString& path, const QString& fileName)
     History history;
     HistoryFileName unpackFileName = history.unpackFileName(fileName);
 
-    QString url = ImgUploaderManager(this).url() + unpackFileName.file;
+    QString url = ImgUploaderManager(this).url();
+    if (unpackFileName.type == QStringLiteral("cloudinary") &&
+        !unpackFileName.token.isEmpty()) {
+        url += QStringLiteral("v%1/").arg(unpackFileName.token);
+    }
+    url += unpackFileName.file;
 
     // load pixmap
     QPixmap pixmap;

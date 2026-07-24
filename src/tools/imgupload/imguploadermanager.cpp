@@ -6,6 +6,7 @@
 // TODO - remove this hard-code and create plugin manager in the future, you may
 // include other storage headers here
 #include "tools/imgupload/storages/cloudinary/cloudinaryuploader.h"
+#include "utils/confighandler.h"
 
 #include <QPixmap>
 #include <QWidget>
@@ -24,7 +25,8 @@ void ImgUploaderManager::init()
     // Cloudinary is the active upload backend for screenshots.
     // Keep the upload flow explicit here so legacy plugin choices cannot
     // fall back to the old Imgur implementation.
-    m_urlString = "https://res.cloudinary.com/";
+    m_urlString = QStringLiteral("https://res.cloudinary.com/%1/image/upload/")
+                    .arg(ConfigHandler().cloudinaryCloudName().trimmed());
     m_imgUploaderPlugin = "cloudinary";
 }
 

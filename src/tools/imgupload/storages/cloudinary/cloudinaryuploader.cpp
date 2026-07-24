@@ -55,10 +55,12 @@ void CloudinaryUploader::handleReply(QNetworkReply* reply)
                 m_currentImageName = m_currentImageName.mid(lastSlash + 1);
             }
 
+            const QString version =
+              json.value(QStringLiteral("version")).toVariant().toString();
+
             History history;
-            m_currentImageName = history.packFileName("cloudinary",
-                                                       QString(),
-                                                       m_currentImageName);
+            m_currentImageName =
+              history.packFileName("cloudinary", version, m_currentImageName);
             history.save(pixmap(), m_currentImageName);
 
             emit uploadOk(imageURL());

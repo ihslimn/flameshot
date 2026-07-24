@@ -27,7 +27,7 @@ GeneralConf::GeneralConf(QWidget* parent)
   , m_undoLimit(nullptr)
 {
     m_layout = new QVBoxLayout(this);
-    m_layout->setAlignment(Qt::AlignTop);
+    //m_layout->setAlignment(Qt::AlignTop);
 
     // Scroll area adapts the size of the content on small screens.
     // It must be initialized before the checkboxes.
@@ -261,15 +261,16 @@ void GeneralConf::resetConfiguration()
 void GeneralConf::initScrollArea()
 {
     m_scrollArea = new QScrollArea(this);
-    m_layout->addWidget(m_scrollArea);
+    m_layout->addWidget(m_scrollArea, 1);
 
     auto* content = new QWidget(m_scrollArea);
     m_scrollArea->setWidget(content);
     m_scrollArea->setWidgetResizable(true);
-    m_scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    m_scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     content->setObjectName("content");
+    content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_scrollArea->setObjectName("scrollArea");
     m_scrollArea->setStyleSheet(
       "#content, #scrollArea { background: transparent; border: 0px; }");
@@ -371,7 +372,7 @@ void GeneralConf::initConfigButtons()
     auto* box = new QGroupBox(tr("Configuration File"));
     box->setFlat(true);
     box->setLayout(buttonLayout);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     m_exportButton = new QPushButton(tr("Export"));
     buttonLayout->addWidget(m_exportButton);
@@ -524,7 +525,7 @@ void GeneralConf::initSaveAfterCopy()
 
     auto* box = new QGroupBox(tr("Save Path"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -589,7 +590,7 @@ void GeneralConf::initUploadHistoryMax()
 {
     auto* box = new QGroupBox(tr("Latest Uploads Max Size"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -611,7 +612,7 @@ void GeneralConf::initUploadClientSecret()
 {
     auto* box = new QGroupBox(tr("Cloudinary upload preset"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -632,7 +633,7 @@ void GeneralConf::initCloudinaryCloudName()
 {
     auto* box = new QGroupBox(tr("Cloudinary cloud name"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -661,9 +662,9 @@ void GeneralConf::cloudinaryCloudNameEdited()
 
 void GeneralConf::initCloudinaryApiSecret()
 {
-    auto* box = new QGroupBox(tr("Cloudinary API secret (for signed uploads)"));
+    auto* box = new QGroupBox(tr("Cloudinary API secret"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -688,9 +689,9 @@ void GeneralConf::cloudinaryApiSecretEdited()
 
   void GeneralConf::initCloudinaryApiKey()
   {
-    auto* box = new QGroupBox(tr("Cloudinary API key (for signed uploads)"));
+    auto* box = new QGroupBox(tr("Cloudinary API key"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -739,7 +740,7 @@ void GeneralConf::initUndoLimit()
 {
     auto* box = new QGroupBox(tr("Undo limit"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);
@@ -903,7 +904,7 @@ void GeneralConf::initShowSelectionGeometry()
 
     auto* box = new QGroupBox(tr("Selection Geometry Display"));
     box->setFlat(true);
-    m_layout->addWidget(box);
+    m_scrollAreaLayout->addWidget(box);
 
     auto* vboxLayout = new QVBoxLayout();
     box->setLayout(vboxLayout);

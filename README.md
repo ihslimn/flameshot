@@ -114,6 +114,12 @@ Example commands:
     flameshot gui
     ```
 
+- Open Latest Uploads:
+
+    ```shell
+    flameshot history
+    ```
+
 - Capture with GUI with custom save path:
 
     ```shell

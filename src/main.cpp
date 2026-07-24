@@ -279,6 +279,11 @@ int main(int argc, char* argv[])
     CommandArgument guiArgument(
       QStringLiteral("gui"),
       QObject::tr("Start a manual capture in GUI mode."));
+#ifdef ENABLE_IMGUR
+    CommandArgument historyArgument(
+      QStringLiteral("history"),
+      QObject::tr("Open the latest uploads window."));
+#endif
     CommandArgument configArgument(QStringLiteral("config"),
                                    QObject::tr("Configure") + " flameshot.");
     CommandArgument screenArgument(
@@ -418,6 +423,9 @@ int main(int argc, char* argv[])
     parser.AddArgument(screenArgument);
     parser.AddArgument(fullArgument);
     parser.AddArgument(launcherArgument);
+#ifdef ENABLE_IMGUR
+    parser.AddArgument(historyArgument);
+#endif
     parser.AddArgument(configArgument);
     auto helpOption = parser.addHelpOption();
     auto versionOption = parser.addVersionOption();
@@ -466,6 +474,12 @@ int main(int argc, char* argv[])
         Flameshot* flameshot = Flameshot::instance();
         flameshot->launcher();
         qApp->exec();
+#ifdef ENABLE_IMGUR
+    } else if (parser.isSet(historyArgument)) { // HISTORY
+        reinitializeAsQApplication(argc, argv, translator, qtTranslator);
+        Flameshot::instance()->history();
+        qApp->exec();
+#endif
     } else if (parser.isSet(guiArgument)) { // GUI
         reinitializeAsQApplication(argc, argv, translator, qtTranslator);
 
